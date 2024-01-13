@@ -1,5 +1,6 @@
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
+import { loadFirestoreAdapter } from 'src/loader/auth-adapter.loader';
 import {
   loadExpressAuth,
   loadExpressEmailProvider,
@@ -7,9 +8,10 @@ import {
 
 export const createExpressAuthAdapter = async () => {
   const app = express();
-  const [expressAuth, emailProvider] = await Promise.all([
+  const [expressAuth, emailProvider, firestoreAdapter] = await Promise.all([
     loadExpressAuth(),
     loadExpressEmailProvider(),
+    loadFirestoreAdapter(),
   ]);
 
   // Make sure to use these body parsers so Auth.js can receive data from the client
@@ -26,6 +28,7 @@ export const createExpressAuthAdapter = async () => {
         }),
       ],
       secret: process.env.NEXTAUTH_SECRET,
+      adapter: firestoreAdapter(),
     }),
   );
 
